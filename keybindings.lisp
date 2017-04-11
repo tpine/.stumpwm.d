@@ -16,15 +16,17 @@ Also add keybinding to the commands.
 C-keybinding calls run-or-raise
 M-keybinding calls run-or-pull"
   `(progn
-    (defcommand ,(intern (format nil "run-or-raise-~a" program-name)) () ()
+     (defvar ,(intern (format nil "*~a-map*" program-name)) nil)
+     (defcommand ,(intern (format nil "run-or-raise-~a" program-name)) () ()
        (run-or-raise ,program-name '(:class ,window-class)))
-    
-    (defcommand ,(intern (format nil "run-or-pull-~a" program-name)) () ()
+     
+     (defcommand ,(intern (format nil "run-or-pull-~a" program-name)) () ()
        (run-or-pull ,program-name '(:class ,window-class)))
-    
-    (define-key *root-map* (kbd ,(format nil "C-~a" keybinding)) ,(format nil "run-or-raise-~a" program-name))
-    
-    (define-key *root-map* (kbd ,(format nil "M-~a" keybinding)) ,(format nil "run-or-pull-~a" program-name))))
+     
+     (fill-keymap ,(intern (format nil "*~a-map*" program-name))
+		  (kbd "p") ,(format nil "run-or-pull-~a" program-name)
+		  (kbd "r") ,(format nil "run-or-raise-~a" program-name))
+     (define-key *root-map* (kbd ,keybinding) (intern ,(format nil "*~a-map*" program-name)))))
 
 (make-program-binding "firefox" "Firefox" "f")
 
