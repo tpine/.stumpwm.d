@@ -18,6 +18,10 @@
 ;;; Set Time Input String
 (setf *time-format-string-default* "%a %b %e %Y %l:%M%P")
 
+;;; Visual
+(set-focus-color "#5d4d7a")
+(set-unfocus-color "#292b2e")
+
 ;; set module directory (if not already set)
 (set-module-dir "/home/thomas/.stumpwm.d/modules/")
 
