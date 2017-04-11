@@ -19,6 +19,11 @@
 (setf *time-format-string-default* "%a %b %e %Y %l:%M%P")
 
 ;;; Visual
+(setf (car *colors*) "#292b2e"
+      (car (last *colors*)) "#5d4d7a")
+
+(update-color-map (current-screen))
+
 (set-focus-color "#5d4d7a")
 (set-unfocus-color "#292b2e")
 
