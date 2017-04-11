@@ -13,19 +13,26 @@
   "Create run-or-raise and run-or-pull commands for program-name
 window-class is the windows-class
 Also add keybinding to the commands. 
-C-keybinding calls run-or-raise
-M-keybinding calls run-or-pull"
+C-keybinding r calls run-or-raise
+C-keybinding p calls run-or-pull
+C-keybinding n creates a new instance of the program"
+  
   `(progn
      (defvar ,(intern (format nil "*~a-map*" program-name)) nil)
+
+     (defcommand ,(intern (format nil "~a" program-name)) () () (run-shell-command ,program-name))
+     
      (defcommand ,(intern (format nil "run-or-raise-~a" program-name)) () ()
-       (run-or-raise ,program-name '(:class ,window-class)))
+		 (run-or-raise ,program-name '(:class ,window-class)))
      
      (defcommand ,(intern (format nil "run-or-pull-~a" program-name)) () ()
-       (run-or-pull ,program-name '(:class ,window-class)))
+		 (run-or-pull ,program-name '(:class ,window-class)))
      
      (fill-keymap ,(intern (format nil "*~a-map*" program-name))
 		  (kbd "p") ,(format nil "run-or-pull-~a" program-name)
-		  (kbd "r") ,(format nil "run-or-raise-~a" program-name))
+		  (kbd "r") ,(format nil "run-or-raise-~a" program-name)
+		  (kbd "n") ,(format nil "~a" program-name))
+     
      (define-key *root-map* (kbd ,keybinding) (intern ,(format nil "*~a-map*" program-name)))))
 
 (make-program-binding "firefox" "Firefox" "f")
