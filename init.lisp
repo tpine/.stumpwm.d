@@ -14,8 +14,12 @@
 
 (setq *startup-message* (format nil "Welcome Thomas!~%Slynk is on port 4004~%Happy Hacking!"))
 
-;; Startup Programs
+;;; Startup Programs
+;;; Set Background
 (run-shell-command "feh --bg-scale /home/thomas/Pictures/wallpapers/outlast_wal_01.png")
+;;; Start redshift
+(run-shell-command "redshift")
+
 
 ;;; Set Time Input String
 (setf *time-format-string-default* "%a %b %e %Y %l:%M%P")
