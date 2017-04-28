@@ -30,6 +30,9 @@
 
 (update-color-map (current-screen))
 
+(set-fg-color "#5d4d7a")
+(set-bg-color "#292b2e")
+(set-border-color "#5d4d7a")
 (set-focus-color "#5d4d7a")
 (set-unfocus-color "#292b2e")
 
