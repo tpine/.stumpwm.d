@@ -25,16 +25,20 @@
 (setf *time-format-string-default* "%a %b %e %Y %l:%M%P")
 
 ;;; Visual
-(setf (car *colors*) "#292b2e"
-      (car (last *colors*)) "#5d4d7a")
+;;; Colors based off spacemacs-dark-theme for emacs
+(let ((grey "#292b2e")
+      (purple "#5d4d7a"))
 
-(update-color-map (current-screen))
+  (set-fg-color purple)
+  (set-bg-color grey)
+  (set-border-color purple)
+  (set-focus-color purple)
+  (set-unfocus-color grey)
+  
+  (setf (car *colors*) grey
+	(car (last *colors*)) purple)
+  (update-color-map (current-screen)))
 
-(set-fg-color "#5d4d7a")
-(set-bg-color "#292b2e")
-(set-border-color "#5d4d7a")
-(set-focus-color "#5d4d7a")
-(set-unfocus-color "#292b2e")
 
 ;; set module directory (if not already set)
 (set-module-dir "/home/thomas/.stumpwm.d/modules/")
