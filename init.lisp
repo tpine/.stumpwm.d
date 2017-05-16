@@ -20,30 +20,13 @@
 ;;; Start redshift
 (run-shell-command "redshift")
 
-
 ;;; Set Time Input String
 (setf *time-format-string-default* "%a %b %e %Y %l:%M%P")
-
-;;; Visual
-;;; Colors based off spacemacs-dark-theme for emacs
-(let ((grey "#292b2e")
-      (purple "#5d4d7a"))
-
-  (set-fg-color purple)
-  (set-bg-color grey)
-  (set-border-color purple)
-  (set-focus-color purple)
-  (set-unfocus-color grey)
-  
-  (setf (car *colors*) grey
-	(car (last *colors*)) purple)
-  (update-color-map (current-screen)))
-
 
 ;; set module directory (if not already set)
 (set-module-dir "/home/thomas/.stumpwm.d/modules/")
 
 ;;; Load pavol changes
 (load "~/.stumpwm.d/volume.lisp")
-(load "~/.stumpwm.d/mode-line.lisp")
+(load "~/.stumpwm.d/visual.lisp")
 (load "~/.stumpwm.d/keybindings.lisp")
