@@ -10,15 +10,23 @@
 ;;; This is to hacky to merge
 (in-package :pavol)
 
+(defparameter *max-volume* (if t
+			       150
+			       100)
+  "The maximum allowed volume.
+pavucontrol allows a max volume percentage of 150.
+this may damage the speakers so make it be explicatly set.
+The default value is 100.")
+
 (defmethod (setf volume) (percentage (sink sink))
-  (assert (<= 0 percentage 150))
+  (assert (<= 0 percentage *max-volume*))
   (pacmd "set-sink-volume ~a ~a"
          (sink-index sink)
          (percentage->integer percentage))
   percentage)
 
 (defun volume-up (sink percentage)
-  (setf (volume sink) (min (+ (volume sink) percentage) 150)))
+  (setf (volume sink) (min (+ (volume sink) percentage) *max-volume*)))
 
 (defun make-volume-bar (percent)
   "Return a string that represents a volume bar"
