@@ -23,10 +23,7 @@
 (defun make-volume-bar (percent)
   "Return a string that represents a volume bar"
   (format nil "^B~3d%^b [^[^7*~a^]]"
-          percent (stumpwm::bar (if (> percent 100)
-				    (progn (setf percent 100)
-					   percent)
-				    percent) 50 #\# #\:)))
+          percent (stumpwm::bar (min 100 percent) 50 #\# #\:)))
 
 ;;; Setup keybindings
 (in-package :stumpwm)
