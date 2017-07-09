@@ -62,5 +62,16 @@ C-keybinding n creates a new instance of the program"
 (define-key *root-map* (kbd "v") "volume-control")
 
 ;;; Shutdown and Reboot
-(define-key *root-map* (kbd "p") "run-shell-command poweroff")
-(define-key *root-map* (kbd "C-p") "run-shell-command reboot")
+(defcommand shutdown (confirm) ((:y-or-n "Confirm Shutdown "))
+  "Ask for the user to confirm before shutting down."
+	    (if confirm
+		(run-shell-command "poweroff")))
+
+(defcommand reboot (confirm) ((:y-or-n "Confirm Reboot "))
+  "Ask for the user to confirm before rebooting."
+	    (if confirm
+		(run-shell-command "reboot")))
+
+(define-key *root-map* (kbd "p") "shutdown")
+(define-key *root-map* (kbd "C-p") "reboot")
+
