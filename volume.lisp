@@ -3,7 +3,7 @@
 ;;; Load package
 (in-package :stumpwm)
 
-(load-module "pavol")
+(load-module :pavol)
 
 ;;; Changes to pavol to get volume to 150%
 ;;; This follows the maximum volume allowed by pavolcontrol

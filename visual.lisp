@@ -20,8 +20,6 @@
   (update-color-map (current-screen)))
 
 ;;; Load battery module
-(load-module "battery-portable")
-(load-module "ttf-fonts")
 (load-module "notify")
 
 ;;; Set notification text color to yellow to make it obvious
@@ -32,6 +30,8 @@
   (stumpwm:message "^B^[^3*~A ~A^]" summary body))
 ;;; Start notification server
 (notify-server-toggle)
+(load-module :battery-portable)
+(load-module :ttf-fonts)
 
 (in-package :stumpwm)
 
