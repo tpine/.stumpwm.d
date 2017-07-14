@@ -43,5 +43,12 @@
 
 (setf *window-format* "%n %10c: %15t|")
 
+;;; When windows are desroyed window numbers are not synced
+;;; 2kays <https://github.com/2kays> posted a solution on
+;;; the TipsAndTricks section of the wiki
+;;; This will repack window numbers every time a window is killed
+(stumpwm:add-hook stumpwm:*destroy-window-hook*
+                  #'(lambda (win) (stumpwm:repack-window-numbers)))
+
 ;; Turn on the modeline
 (toggle-mode-line (current-screen) (current-head))
