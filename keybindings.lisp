@@ -39,8 +39,6 @@ C-keybinding n creates a new instance of the program"
 
 (make-program-binding "thunar" "Thunar" "m")
 
-(make-program-binding "termite" "Termite" "c")
-
 (make-program-binding "emacs" "Emacs" "e")
 
 ;; Setup bindings for less common aplications which would be opened then closed
