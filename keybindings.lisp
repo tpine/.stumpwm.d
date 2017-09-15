@@ -34,7 +34,30 @@ C-keybinding n creates a new instance of the program"
 		  (kbd "r") ,(format nil "run-or-raise-~a" alias)
 		  (kbd "n") ,(format nil "~a" alias))
      
-     (define-key *root-map* (kbd ,keybinding) (intern ,(format nil "*~a-map*" alias)))))
+     (defvar ,(intern (format nil "*~a-keybind-fragment*" alias)) (list define-key nil (kbd ,keybinding) (intern ,(format nil "*~a-map*" alias))))))
+
+(defvar *layout-map* nil)
+
+(define-key *root-map* (kbd "l") *layout-map*)
+
+(defmacro make-layout (name programs keybinding)
+  "Make a keymap which conatins the settings for all programs
+For programs defined using an alias use the alias instead of the program name"
+  `(progn
+     (defvar ,(intern (format nil "*~a-layout-map*" name)) nil)
+    
+     (loop for program in ,programs
+	    do (eval (setf (second ,(intern (format nil "*~a-keybind-fragment*" name)))
+			   ,(intern (format nil "*~a-layout-map*" name)))))
+     (define-key *layout-map* ,(intern (format nil "*~a-layout-map*" name)) (kbd ,keybinding))))
+
+(make-layout "work" ("emacs"
+		     "firefox")
+	     "w")
+
+(defmacro fill-root-map (layouts)
+  "Fill *root-map* with the first layout in the list of layouts and hang the layouts off (kbd l)"
+  )
 
 (make-program-binding "firefox" "Firefox" "f")
 
