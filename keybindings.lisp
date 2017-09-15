@@ -40,9 +40,9 @@ C-keybinding n creates a new instance of the program"
 
 (make-program-binding "thunar" "Thunar" "m")
 
-(make-program-binding "termite" "Termite" "c")
+(make-program-binding "terminator" "Terminator" "c")
 
-(make-program-binding "emacs" "Emacs" "e")
+(make-program-binding "emacsclient -c -a emacs" "Emacs" "e" "emacs")
 
 ;; Setup bindings for less common aplications which would be opened then closed
 (defcommand screenshot () ()

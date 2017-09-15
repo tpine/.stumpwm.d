@@ -19,6 +19,7 @@
 (run-shell-command "feh --bg-scale /home/thomas/Pictures/wallpapers/outlast_wal_01.png")
 ;;; Start redshift
 (run-shell-command "redshift")
+(run-shell-command "emacs --daemon")
 
 ;;; Set Time Input String
 (setf *time-format-string-default* "%a %b %e %Y %l:%M%P")
