@@ -34,9 +34,9 @@ C-keybinding n creates a new instance of the program"
 		  (kbd "r") ,(format nil "run-or-raise-~a" alias)
 		  (kbd "n") ,(format nil "~a" alias))
      
-     (defvar ,(intern (format nil "*~a-keybind-fragment*" alias)) (list define-key nil (kbd ,keybinding) (intern ,(format nil "*~a-map*" alias))))))
+     (defparameter ,(intern (format nil "*~a-keybind-fragment*" alias)) '(,keybinding ,(intern (format nil "*~a-map*" alias))))))
 
-(defvar *layout-map* nil)
+(defparameter *layout-map* (make-sparse-keymap))
 
 (define-key *root-map* (kbd "l") *layout-map*)
 
@@ -44,20 +44,16 @@ C-keybinding n creates a new instance of the program"
   "Make a keymap which conatins the settings for all programs
 For programs defined using an alias use the alias instead of the program name"
   `(progn
-     (defvar ,(intern (format nil "*~a-layout-map*" name)) nil)
-    
-     (loop for program in ,programs
-	    do (eval (setf (second ,(intern (format nil "*~a-keybind-fragment*" name)))
-			   ,(intern (format nil "*~a-layout-map*" name)))))
-     (define-key *layout-map* ,(intern (format nil "*~a-layout-map*" name)) (kbd ,keybinding))))
+     (defcommand ,(intern (format nil "switch-to-~a-layout" name)) () ()
+       "Fill *root-map* with the first layout in the list of layouts and hang the layouts off (kbd l)"
+       (loop for program in ',(loop for program in programs
+				  collect (let ((fragment (symbol-value (intern (format nil "*~a-keybind-fragment*" program)))))
+					    (list 'define-key '*root-map* (list 'kbd (first fragment)) (second fragment))))
+	     do (eval program)))
+     
+     (define-key *layout-map* (kbd ,keybinding) ,(format nil "switch-to-~a-layout" name))))
 
-(make-layout "work" ("emacs"
-		     "firefox")
-	     "w")
 
-(defmacro fill-root-map (layouts)
-  "Fill *root-map* with the first layout in the list of layouts and hang the layouts off (kbd l)"
-  )
 
 (make-program-binding "firefox" "Firefox" "f")
 
@@ -66,6 +62,14 @@ For programs defined using an alias use the alias instead of the program name"
 (make-program-binding "terminator" "Terminator" "c")
 
 (make-program-binding "emacsclient -c -a emacs" "Emacs" "e" "emacs")
+
+(make-layout "home" ("emacs"
+		     "firefox"
+		     "thunar"
+		     "terminator")
+	     "h")
+
+(run-commands "switch-to-home-layout")
 
 ;; Setup bindings for less common aplications which would be opened then closed
 (defcommand screenshot () ()
