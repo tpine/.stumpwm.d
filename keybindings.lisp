@@ -9,37 +9,67 @@
 (define-key *root-map* (kbd "2") "vsplit")
 (define-key *root-map* (kbd "3") "hsplit")
 
-(defmacro make-program-binding (program-name window-class keybinding)
+(defmacro make-program-binding (program-name window-class keybinding &optional alias)
   "Create run-or-raise and run-or-pull commands for program-name
 window-class is the windows-class
 Also add keybinding to the commands. 
 C-keybinding r calls run-or-raise
 C-keybinding p calls run-or-pull
 C-keybinding n creates a new instance of the program"
-  
+  (if (not alias)
+      (setf alias program-name))
   `(progn
-     (defvar ,(intern (format nil "*~a-map*" program-name)) nil)
+     (defvar ,(intern (format nil "*~a-map*" alias)) nil)
 
-     (defcommand ,(intern (format nil "~a" program-name)) () () (run-shell-command ,program-name))
+     (defcommand ,(intern (format nil "~a" alias)) () () (run-shell-command ,program-name))
      
-     (defcommand ,(intern (format nil "run-or-raise-~a" program-name)) () ()
+     (defcommand ,(intern (format nil "run-or-raise-~a" alias)) () ()
 		 (run-or-raise ,program-name '(:class ,window-class)))
      
-     (defcommand ,(intern (format nil "run-or-pull-~a" program-name)) () ()
+     (defcommand ,(intern (format nil "run-or-pull-~a" alias)) () ()
 		 (run-or-pull ,program-name '(:class ,window-class)))
      
-     (fill-keymap ,(intern (format nil "*~a-map*" program-name))
-		  (kbd "p") ,(format nil "run-or-pull-~a" program-name)
-		  (kbd "r") ,(format nil "run-or-raise-~a" program-name)
-		  (kbd "n") ,(format nil "~a" program-name))
+     (fill-keymap ,(intern (format nil "*~a-map*" alias))
+		  (kbd "p") ,(format nil "run-or-pull-~a" alias)
+		  (kbd "r") ,(format nil "run-or-raise-~a" alias)
+		  (kbd "n") ,(format nil "~a" alias))
      
-     (define-key *root-map* (kbd ,keybinding) (intern ,(format nil "*~a-map*" program-name)))))
+     (defparameter ,(intern (format nil "*~a-keybind-fragment*" alias)) '(,keybinding ,(intern (format nil "*~a-map*" alias))))))
+
+(defparameter *layout-map* (make-sparse-keymap))
+
+(define-key *root-map* (kbd "l") *layout-map*)
+
+(defmacro make-layout (name programs keybinding)
+  "Make a keymap which conatins the settings for all programs
+For programs defined using an alias use the alias instead of the program name"
+  `(progn
+     (defcommand ,(intern (format nil "switch-to-~a-layout" name)) () ()
+       "Fill *root-map* with the first layout in the list of layouts and hang the layouts off (kbd l)"
+       (loop for program in ',(loop for program in programs
+				  collect (let ((fragment (symbol-value (intern (format nil "*~a-keybind-fragment*" program)))))
+					    (list 'define-key '*root-map* (list 'kbd (first fragment)) (second fragment))))
+	     do (eval program)))
+     
+     (define-key *layout-map* (kbd ,keybinding) ,(format nil "switch-to-~a-layout" name))))
+
+
 
 (make-program-binding "firefox" "Firefox" "f")
 
 (make-program-binding "thunar" "Thunar" "m")
 
-(make-program-binding "emacs" "Emacs" "e")
+(make-program-binding "terminator" "Terminator" "c")
+
+(make-program-binding "emacsclient -c -a emacs" "Emacs" "e" "emacs")
+
+(make-layout "home" ("emacs"
+		     "firefox"
+		     "thunar"
+		     "terminator")
+	     "h")
+
+(run-commands "switch-to-home-layout")
 
 ;; Setup bindings for less common aplications which would be opened then closed
 (defcommand screenshot () ()
