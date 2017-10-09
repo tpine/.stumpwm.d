@@ -36,7 +36,7 @@ C-keybinding n creates a new instance of the program"
      
      (define-key *root-map* (kbd ,keybinding) (intern ,(format nil "*~a-map*" alias)))))
 
-(make-program-binding "firefox" "Firefox" "f")
+(make-program-binding "firefox-developer" "Firefox" "f")
 
 (make-program-binding "thunar" "Thunar" "m")
 
