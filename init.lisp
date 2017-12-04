@@ -27,6 +27,15 @@
 ;; set module directory (if not already set)
 (set-module-dir "/home/thomas/.stumpwm.d/modules/")
 
+(defun restart-slynk ()
+  "Restart Slynk and reload source.
+This is needed if Sly updates while StumpWM is running"
+  (slynk:stop-server 4004)
+  (push (concatenate 'string (get-sly-path) "slynk/") asdf:*central-registry*)
+  (ql:quickload :slynk)
+  (slynk:create-server :port 4004
+		     :dont-close t))
+
 ;;; Load pavol changes
 (load "~/.stumpwm.d/volume.lisp")
 (load "~/.stumpwm.d/visual.lisp")
