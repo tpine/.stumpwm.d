@@ -21,6 +21,9 @@
 (run-shell-command "redshift")
 (run-shell-command "emacs --daemon")
 
+;;; Swap Caps with Ctrl
+(run-shell-command "setxkbmap -option ctrl:swapcaps")
+
 ;;; Set Time Input String
 (setf *time-format-string-default* "%a %b %e %Y %l:%M%P")
 
