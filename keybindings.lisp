@@ -63,6 +63,12 @@ For programs defined using an alias use the alias instead of the program name"
 
 (make-program-binding "emacsclient -c -a emacs" "Emacs" "e" "emacs")
 
+(make-program-binding "insomnia" "Insomnia" "i")
+
+(make-program-binding "robo3t" "robo3t" "r")
+
+(make-program-binding "dbeaver" "DBeaver" "d")
+
 (make-layout "home" ("emacs"
 		     "firefox"
 		     "thunar"
