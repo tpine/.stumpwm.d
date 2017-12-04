@@ -75,6 +75,15 @@ For programs defined using an alias use the alias instead of the program name"
 		     "terminator")
 	     "h")
 
+(make-layout "work" ("emacs"
+		     "firefox"
+		     "thunar"
+		     "terminator"
+		     "insomnia"
+		     "robo3t"
+		     "dbeaver")
+	     "w")
+
 (run-commands "switch-to-home-layout")
 
 ;; Setup bindings for less common aplications which would be opened then closed
