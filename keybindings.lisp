@@ -55,7 +55,7 @@ For programs defined using an alias use the alias instead of the program name"
 
 
 
-(make-program-binding "firefox-developer" "Firefox" "f")
+(make-program-binding "firefox-developer" "Firefox" "f" "firefox")
 
 (make-program-binding "thunar" "Thunar" "m")
 
