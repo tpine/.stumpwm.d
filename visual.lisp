@@ -22,7 +22,7 @@
 ;;; Load battery module
 (load-module "notify")
 
-;;; Set notification text color to yellow to make it obvious
+;; Set notification text color to yellow to make it obvious
 (in-package :notify)
 (defun show-notification (app icon summary body)
   "Show the notification using standard STUMPWM::MESSAGE function"
@@ -30,16 +30,30 @@
   (stumpwm:message "^B^[^3*~A ~A^]" summary body))
 ;;; Start notification server
 (notify-server-toggle)
-(load-module :battery-portable)
 (load-module :ttf-fonts)
 
-(in-package :stumpwm)
+;; (load-module :ttf-fonts)
 
+(in-package :stumpwm)
+(load-module :battery-portable)
 (set-font "-*-dejavu sans mono-bold-r-*-*-12-*-*-*-*-*-*-*")
+
+(defun get-unread-emails ()
+  (let ((emails (remove #\Newline (run-shell-command "notmuch count tag:unread" t))))
+    (if (equal emails "0")
+	"EMAILS"
+	"^[^3*EMAILS^]")))
+
+(defun battery-format (ml)
+  (declare (ignore ml))
+  (let ((battery-line (battery-portable::fmt-bat nil)))
+    (if (equal battery-line "(no battery)")
+	""
+	(concat battery-line " | "))))
 
 ;; Show time, cpu usage and network traffic in the modelinecomment 
 (setf *screen-mode-line-format*
-      (list "%B | " '(:eval (time-format "%l:%M")) "  |%W"))
+      (list '(:eval (battery-format)) '(:eval (time-format "%l:%M")) " | " '(:eval (get-unread-emails)) " |%W"))
 
 (setf *window-format* "%n %10c: %15t|")
 
