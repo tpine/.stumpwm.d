@@ -30,7 +30,6 @@
   (stumpwm:message "^B^[^3*~A ~A^]" summary body))
 ;;; Start notification server
 (notify-server-toggle)
-(load-module :ttf-fonts)
 
 ;; (load-module :ttf-fonts)
 
@@ -51,9 +50,13 @@
 	""
 	(concat battery-line " | "))))
 
+(defun get-utc-time ()
+  (subseq (run-shell-command "date -u +%H:%M" t) 0 5))
+
+
 ;; Show time, cpu usage and network traffic in the modelinecomment 
 (setf *screen-mode-line-format*
-      (list '(:eval (battery-format)) '(:eval (time-format "%l:%M")) " | " '(:eval (get-unread-emails)) " |%W"))
+      (list '(:eval (battery-format)) '(:eval (time-format "%l:%M")) " EST | " '(:eval (get-utc-time)) " UTC | " '(:eval (get-unread-emails)) " |%W"))
 
 (setf *window-format* "%n %10c: %15t|")
 
