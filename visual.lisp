@@ -56,7 +56,7 @@
 
 ;; Show time, cpu usage and network traffic in the modelinecomment 
 (setf *screen-mode-line-format*
-      (list '(:eval (battery-format)) '(:eval (time-format "%l:%M")) " EST | " '(:eval (get-utc-time)) " UTC | " '(:eval (get-unread-emails)) " |%W"))
+      (list '(:eval (battery-format)) '(:eval (time-format "%H:%M")) " EST | " '(:eval (get-utc-time)) " UTC | " '(:eval (get-unread-emails)) " |%W"))
 
 (setf *window-format* "%n %10c: %15t|")
 
