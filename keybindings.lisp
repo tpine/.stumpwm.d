@@ -34,7 +34,7 @@ C-keybinding n creates a new instance of the program"
 		  (kbd "r") ,(format nil "run-or-raise-~a" alias)
 		  (kbd "n") ,(format nil "~a" alias))))
 
-(make-program-binding "firefox-developer-edition" "Firefox" "firefox")
+(make-program-binding "firefox-developer-edition" "firefoxdeveloperedition" "firefox")
 
 (make-program-binding "thunar" "Thunar")
 
