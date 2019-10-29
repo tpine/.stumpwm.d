@@ -1,3 +1,11 @@
+;;; If quicklisp does not exist we need to load it
+;;; This is useful for guix based systems
+#-quicklisp
+(let ((quicklisp-init (merge-pathnames "quicklisp/setup.lisp"
+                                       (user-homedir-pathname))))
+  (when (probe-file quicklisp-init)
+    (load quicklisp-init)))
+
 ;;; Load extra packages
 (ql:quickload :cl-utilities)
 
