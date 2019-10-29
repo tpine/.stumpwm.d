@@ -40,7 +40,7 @@ C-keybinding n creates a new instance of the program"
 
 (make-program-binding "terminator" "Terminator")
 
-(make-program-binding "emacsclient -c -a ''" "Emacs" "emacs")
+(make-program-binding "emacsclient -c" "Emacs" "emacs")
 
 (make-program-binding "insomnia" "Insomnia")
 
