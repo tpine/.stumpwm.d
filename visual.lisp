@@ -106,7 +106,11 @@
 
 (in-package :stumpwm)
 (load-module :battery-portable)
-(set-font "-*-dejavu sans mono-bold-r-*-*-12-*-*-*-*-*-*-*")
+
+(ql:quickload :clx-truetype)
+(load-module "ttf-fonts")
+(xft:cache-fonts)
+(set-font (make-instance 'xft:font :family "DejaVu Sans Mono" :subfamily "Bold" :slant "r" :size 10))
 
 (defun get-unread-emails ()
   (let ((emails (remove #\Newline (run-shell-command "notmuch count tag:unread" t))))
