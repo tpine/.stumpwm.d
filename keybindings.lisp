@@ -50,11 +50,14 @@ C-keybinding n creates a new instance of the program"
 
 (make-program-binding "spotify" "Spotify")
 
+(make-program-binding "keepassxc" "keepassxc")
+
 (define-key *root-map* (kbd "f") |*firefox-map*|)
 (define-key *root-map* (kbd "e") |*emacs-map*|)
 (define-key *root-map* (kbd "m") |*thunar-map*|)
 (define-key *root-map* (kbd "c") |*terminator-map*|)
 (define-key *root-map* (kbd "q") |*spotify-map*|)
+(define-key *root-map* (kbd "p") |*keepassxc-map*|)
 
 (defcommand work-keybindings () ()
   (define-key *root-map* (kbd "i") |*insomnia-map*|)
