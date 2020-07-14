@@ -136,3 +136,13 @@ C-keybinding n creates a new instance of the program"
     m))
 
 (define-key *root-map* (kbd "s") *system-map*)
+
+(defcommand user-switch-to-screen (screen-num) ((:number "Screen Number: "))
+  (select-window-by-number (window-number (car (head-windows (current-group)
+							     (nth screen-num (group-heads (current-group)))))))
+  (group-wake-up (current-group)))
+
+(define-key *root-map* (kbd "F1") "user-switch-to-screen 1")
+(define-key *root-map* (kbd "F2") "user-switch-to-screen 2")
+(define-key *root-map* (kbd "F3") "user-switch-to-screen 0")
+
