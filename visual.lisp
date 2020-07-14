@@ -143,4 +143,6 @@
                   #'(lambda (win) (stumpwm:repack-window-numbers)))
 
 ;; Turn on the modeline
-(toggle-mode-line (current-screen) (current-head))
+(mapcar (lambda (head)
+	  (toggle-mode-line (current-screen) head))
+	(group-heads (current-group)))
