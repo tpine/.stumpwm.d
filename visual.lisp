@@ -197,13 +197,95 @@
 	""
 	(concat battery-line " | "))))
 
+(defvar *gitlab-credentials* nil)
+(defvar *gitlab-status* nil)
+(defvar *updating-gitlab-status* nil)
+
+(defun get-gitlab-token ()
+  (with-open-file (stream ".gitlab.lisp")
+     (with-standard-io-syntax
+       (setf *gitlab-credentials* (read stream)))))
+
+(get-gitlab-token)
+
+(defun print-hash-entry (key value)
+  (format t "The value associated with the key ~S is ~S~%" key value))
+
+(defun print-hash-entrys (hash)
+   (with-hash-table-iterator (my-iterator hash)
+    (loop
+      (multiple-value-bind (entry-p key value)
+          (my-iterator)
+        (if entry-p
+            (print-hash-entry key value)
+            (return))))))
+
+(defun get-gitlab-groups ()
+  (let ((stream (drakma:http-request "https://gitlab.com/api/v4/groups/"
+				      :additional-headers (list (cons "PRIVATE-TOKEN" (getf *gitlab-credentials* :access-token)))
+				      :want-stream t)))
+    (yason:parse stream)))
+
+(defun get-gitlab-groups-projects (group)
+  (let ((stream (drakma:http-request (format nil "https://gitlab.com/api/v4/groups/~a/projects" group)
+				      :additional-headers (list (cons "PRIVATE-TOKEN" (getf *gitlab-credentials* :access-token)))
+				      :want-stream t)))
+    (yason:parse stream)))
+
+(defun get-gitlab-pipeline (pipeline)
+  (let ((test (multiple-value-list (drakma:http-request (format nil "https://gitlab.com/api/v4/projects/~a/pipelines" (car pipeline))
+							:additional-headers (list (cons "PRIVATE-TOKEN" (getf *gitlab-credentials* :access-token)))))))
+    ;; Highest pipeline id is first
+    (let ((newest-pipeline (first (yason:parse (flexi-streams:octets-to-string (nth 0 test))))))
+      
+      (if newest-pipeline
+	  (list :status (gethash "status" newest-pipeline) :name (car (last pipeline)))))))
+
+(defun get-pipeline-status ()
+  (let ((status (mapcar
+		 (lambda (x)
+		   (let ((id (gethash "id" x)))
+		     (if id
+			 (get-gitlab-pipeline (list (gethash "id" x) (gethash "name" x))))))
+		 (alexandria:flatten
+		  (mapcar
+		   (lambda (x)  
+		     (get-gitlab-groups-projects (gethash "id" x)))
+		   (alexandria:flatten (get-gitlab-groups)))))))
+    (let ((success (remove-if-not (lambda (x) (format t "~a" x) (equal "success" (getf x :status))) status))
+	  (failed (remove-if-not (lambda (x) (equal "failed" (getf x :status))) status)))
+      (setf *gitlab-status* (list :success (list-length success)
+				  :failed (list :number (list-length failed)
+						:projects (mapcar
+							   (lambda (y) (getf y :name))
+							   failed)))))))
+
+(defun gitlab-get-failed-pipeline-project-names ()
+  (mapcar (lambda (x) (format t "~a~%" x)) (getf (getf *gitlab-status* :failed) :projects)))
+
+(defun get-gitlab-ci-message ()
+  (bt:make-thread
+   (lambda ()
+
+       (if (equal *updating-gitlab-status* nil)
+	   (progn (setf *updating-gitlab-status* t)
+		  (get-pipeline-status)
+		  (setf *updating-gitlab-status* nil)))))
+
+  (let ((failed-count (getf (getf *gitlab-status* :failed) :number)))
+    (format t "~a" failed-count)
+    (cond ((not *gitlab-status*) "^[^1*CI^]")
+	  ((equal failed-count 0) "^[^2*CI^]")
+	  ((> failed-count 0) (format nil "^[^1*~a CI^]" failed-count)))))
+
+
 (defun get-utc-time ()
   (subseq (run-shell-command "date -u +%H:%M" t) 0 5))
 
 
 ;; Show time, cpu usage and network traffic in the modelinecomment 
 (setf *screen-mode-line-format*
-      (list '(:eval (battery-format)) '(:eval (time-format "%H:%M")) " EST | " '(:eval (get-utc-time)) " UTC | " '(:eval (get-unread-emails)) " |%W"))
+      (list '(:eval (battery-format)) '(:eval (time-format "%H:%M")) " EST | " '(:eval (get-utc-time)) " UTC | " '(:eval (get-unread-emails)) " | " '(:eval (get-gitlab-ci-message)) " |%W"))
 
 (setf *window-format* "%n %10c: %15t|")
 
