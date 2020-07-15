@@ -24,14 +24,8 @@
 
 ;;; Startup Programs
 ;;; Set Background
-(run-shell-command "feh --bg-scale /home/thomas/Pictures/wallpapers/outlast_wal_01.png")
-;;; Start redshift
-(run-shell-command "redshift")
-(run-shell-command "syncthing -no-browser -home=/home/thomas/.config/syncthing")
+(run-shell-command "shepherd")
 (run-shell-command "emacs --daemon")
-
-;;; Swap Caps with Ctrl
-(run-shell-command "setxkbmap -option ctrl:swapcaps")
 
 ;;; Set Time Input String
 (setf *time-format-string-default* "%a %b %e %Y %l:%M%P")
