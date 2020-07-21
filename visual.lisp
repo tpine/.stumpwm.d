@@ -9,6 +9,19 @@
 
 (in-package :stumpwm)
 
+;;; Rewrite fmt-head-window-list so that we have window title seperators
+(defun fmt-head-window-list (ml)
+  "Using *window-format*, return a 1 line list of the windows, space seperated."
+  (format nil "~{~a~^ | ~} |"
+          (mapcar (lambda (w)
+                    (let ((str (format-expand *window-formatters* *window-format* w)))
+                      (if (eq w (current-window))
+                          (fmt-highlight str)
+                          str)))
+                  (sort1 (head-windows (mode-line-current-group ml) (mode-line-head ml))
+                         #'< :key #'window-number))))
+
+
 ;;; Visual
 (defvar *themes* (make-hash-table))
 (defun add-theme (name theme)
@@ -285,9 +298,9 @@
 
 ;; Show time, cpu usage and network traffic in the modelinecomment 
 (setf *screen-mode-line-format*
-      (list '(:eval (battery-format)) '(:eval (time-format "%H:%M")) " EST | " '(:eval (get-utc-time)) " UTC | " '(:eval (get-unread-emails)) " | " '(:eval (get-gitlab-ci-message)) " |%W"))
+      (list '(:eval (battery-format)) '(:eval (time-format "%H:%M")) " EST | " '(:eval (get-utc-time)) " UTC | " '(:eval (get-unread-emails)) " | " '(:eval (get-gitlab-ci-message)) " | %W"))
 
-(setf *window-format* "%n %10c: %15t|")
+(setf *window-format* "%n %10c: %15t")
 
 ;;; When windows are desroyed window numbers are not synced
 ;;; 2kays <https://github.com/2kays> posted a solution on
