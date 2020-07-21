@@ -1,11 +1,4 @@
 (ql:quickload :bt-semaphore)
-(ql:quickload :drakma)
-(ql:quickload :cxml)
-(ql:quickload :clss)
-(ql:quickload :lquery)
-(ql:quickload :plump)
-(ql:quickload :xpath)
-(ql:quickload :yason)
 
 (in-package :stumpwm)
 
@@ -134,74 +127,24 @@
 (xft:cache-fonts)
 (set-font (make-instance 'xft:font :family "DejaVu Sans Mono" :subfamily "Bold" :slant "r" :size 10))
 
-(defparameter *unread-emails* nil)
-(defparameter *updating-email-count* nil)
-
-(defvar *google-tokens* nil)
+(load-module "cl-gmail-oauth")
+(defvar *updating-email-count* nil)
 
 
-(defun load-google-credentials ()
-  (with-open-file (stream ".google.lisp")
-     (with-standard-io-syntax
-       (setf *google-tokens* (read stream)))))
-
-(defun save-google-credentials ()
-  (with-open-file (out ".google.lisp"
-                   :direction :output
-                   :if-exists :supersede)
-    (with-standard-io-syntax
-      (print *google-tokens* out))))
-
-(load-google-credentials)
-
-(defun refresh-access-token ()
-  (let ((refresh-token (getf *google-tokens* :refresh-token))
-	(client-id (getf *google-tokens* :client-id))
-	(client-secret (getf *google-tokens* :client-secret)))
-    (setf (getf *google-tokens* :access-token)
-	  (gethash
-	   "access_token"
-	   (yason:parse (drakma:http-request
-			 "https://accounts.google.com/o/oauth2/token"
-			 :method :post
-			 :parameters (list (cons "client_id" client-id)
-					   (cons "client_secret" client-secret)
-					   (cons "refresh_token" refresh-token)
-					   (cons "grant_type" "refresh_token"))
-			 :want-stream t))))))
-
-
-(defun get-unread-email-count (xml)
-  (format t "~a" xml)
-  (let ((doc (plump:parse xml)))
-    (plump:render-text (car (plump:get-elements-by-tag-name doc "fullcount")))))
 
 (defun get-unread-emails ()
   (bt:make-thread
    (lambda ()
+     (if (not *updating-email-count*)
+	 (progn
+	   (setf *updating-email-count* t)
+	   (cl-gmail-oauth:get-unread-emails)
+	   (setf *updating-email-count* nil)))))
+  
+  (cond ((equal cl-gmail-oauth:*unread-emails* "0") "^[^2*EMAILS^]")
+	((not cl-gmail-oauth:*unread-emails*) "^[^1*EMAILS^]")
+	(t (format nil "^[^3*~a EMAILS^]" cl-gmail-oauth:*unread-emails*))))
 
-       (if (equal *updating-email-count* nil)
-	   (progn (setf *updating-email-count* t)
-		  (handler-case
-		      (let* ((request (multiple-value-list (drakma:http-request
-						      "https://mail.google.com/mail/feed/atom"
-						      :additional-headers (list (cons "Authorization" (format nil "Bearer ~a" (getf *google-tokens* :access-token)))))))
-			     (stream (nth 0 request)))
-			(cond ((equal (nth 1 request) 401)
-			       (refresh-access-token)
-			       (setf *unread-emails* nil
-				     *updating-email-count* nil))
-			      (t
-			       (setf *unread-emails* (get-unread-email-count stream)
-				     *updating-email-count* nil))))
-		    (usocket:ns-try-again-condition (c) ;; <-- optional argument
-		      (declare (ignore c))
-		      (setf *unread-emails* nil
-			    *updating-email-count* nil)))))))
-   
-  (cond ((equal *unread-emails* "0") "^[^2*EMAILS^]")
-	((not *unread-emails*) "^[^1*EMAILS^]")
-	(t (format nil "^[^3*~a EMAILS^]" *unread-emails*))))
 
 (defun battery-format (ml)
   (declare (ignore ml))
@@ -210,71 +153,8 @@
 	""
 	(concat battery-line " | "))))
 
-(defvar *gitlab-credentials* nil)
-(defvar *gitlab-status* nil)
+(load-module "cl-gitlab")
 (defvar *updating-gitlab-status* nil)
-
-(defun get-gitlab-token ()
-  (with-open-file (stream ".gitlab.lisp")
-     (with-standard-io-syntax
-       (setf *gitlab-credentials* (read stream)))))
-
-(get-gitlab-token)
-
-(defun print-hash-entry (key value)
-  (format t "The value associated with the key ~S is ~S~%" key value))
-
-(defun print-hash-entrys (hash)
-   (with-hash-table-iterator (my-iterator hash)
-    (loop
-      (multiple-value-bind (entry-p key value)
-          (my-iterator)
-        (if entry-p
-            (print-hash-entry key value)
-            (return))))))
-
-(defun get-gitlab-groups ()
-  (let ((stream (drakma:http-request "https://gitlab.com/api/v4/groups/"
-				      :additional-headers (list (cons "PRIVATE-TOKEN" (getf *gitlab-credentials* :access-token)))
-				      :want-stream t)))
-    (yason:parse stream)))
-
-(defun get-gitlab-groups-projects (group)
-  (let ((stream (drakma:http-request (format nil "https://gitlab.com/api/v4/groups/~a/projects" group)
-				      :additional-headers (list (cons "PRIVATE-TOKEN" (getf *gitlab-credentials* :access-token)))
-				      :want-stream t)))
-    (yason:parse stream)))
-
-(defun get-gitlab-pipeline (pipeline)
-  (let ((test (multiple-value-list (drakma:http-request (format nil "https://gitlab.com/api/v4/projects/~a/pipelines" (car pipeline))
-							:additional-headers (list (cons "PRIVATE-TOKEN" (getf *gitlab-credentials* :access-token)))))))
-    ;; Highest pipeline id is first
-    (let ((newest-pipeline (first (yason:parse (flexi-streams:octets-to-string (nth 0 test))))))
-      
-      (if newest-pipeline
-	  (list :status (gethash "status" newest-pipeline) :name (car (last pipeline)))))))
-
-(defun get-pipeline-status ()
-  (let ((status (mapcar
-		 (lambda (x)
-		   (let ((id (gethash "id" x)))
-		     (if id
-			 (get-gitlab-pipeline (list (gethash "id" x) (gethash "name" x))))))
-		 (alexandria:flatten
-		  (mapcar
-		   (lambda (x)  
-		     (get-gitlab-groups-projects (gethash "id" x)))
-		   (alexandria:flatten (get-gitlab-groups)))))))
-    (let ((success (remove-if-not (lambda (x) (format t "~a" x) (equal "success" (getf x :status))) status))
-	  (failed (remove-if-not (lambda (x) (equal "failed" (getf x :status))) status)))
-      (setf *gitlab-status* (list :success (list-length success)
-				  :failed (list :number (list-length failed)
-						:projects (mapcar
-							   (lambda (y) (getf y :name))
-							   failed)))))))
-
-(defun gitlab-get-failed-pipeline-project-names ()
-  (mapcar (lambda (x) (format t "~a~%" x)) (getf (getf *gitlab-status* :failed) :projects)))
 
 (defun get-gitlab-ci-message ()
   (bt:make-thread
@@ -282,15 +162,14 @@
 
        (if (equal *updating-gitlab-status* nil)
 	   (progn (setf *updating-gitlab-status* t)
-		  (get-pipeline-status)
+		  (cl-gitlab:get-pipeline-status)
 		  (setf *updating-gitlab-status* nil)))))
 
-  (let ((failed-count (getf (getf *gitlab-status* :failed) :number)))
+  (let ((failed-count (getf (getf cl-gitlab:*gitlab-status* :failed) :number)))
     (format t "~a" failed-count)
-    (cond ((not *gitlab-status*) "^[^1*CI^]")
+    (cond ((not cl-gitlab:*gitlab-status*) "^[^1*CI^]")
 	  ((equal failed-count 0) "^[^2*CI^]")
 	  ((> failed-count 0) (format nil "^[^1*~a CI^]" failed-count)))))
-
 
 (defun get-utc-time ()
   (subseq (run-shell-command "date -u +%H:%M" t) 0 5))
