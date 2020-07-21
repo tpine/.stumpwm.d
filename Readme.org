@@ -1,0 +1,5 @@
+* Stumpwm Init Files
+  init.lisp is the autoloaded entrypoint.
+
+  This sets up asdf and then loads the package stumpwm-init.
+  That package then does the proper initialisation using asdf to manage dependencies.
