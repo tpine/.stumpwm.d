@@ -1,9 +1,9 @@
 ;;;; cl-gitlab.asd
 
 (asdf:defsystem #:cl-gitlab
-  :description "Describe cl-gitlab here"
-  :author "Your Name <your.name@example.com>"
-  :license  "Specify license here"
+  :description "Module to get gitlab information"
+  :author "Thomas Atkinson <tnatkinson@gmail.com>"
+  :license  "GPLv2"
   :version "0.0.1"
   :depends-on (:drakma
 	       :yason

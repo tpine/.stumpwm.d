@@ -1,5 +1,3 @@
-(ql:quickload :bt-semaphore)
-
 (in-package :stumpwm)
 
 ;;; Rewrite fmt-head-window-list so that we have window title seperators
@@ -105,32 +103,10 @@
 
 (apply-theme (gethash 'gruvbox *themes*))
 
-;;; Load battery module
-(load-module "notify")
-
-;; Set notification text color to yellow to make it obvious
-(in-package :notify)
-(defun show-notification (app icon summary body)
-  "Show the notification using standard STUMPWM::MESSAGE function"
-  (declare (ignore app icon))
-  (stumpwm:message "^B^[^3*~A ~A^]" summary body))
-;;; Start notification server
-(notify-server-toggle)
-
-;; (load-module :ttf-fonts)
-
-(in-package :stumpwm)
-(load-module :battery-portable)
-
-(ql:quickload :clx-truetype)
-(load-module "ttf-fonts")
 (xft:cache-fonts)
 (set-font (make-instance 'xft:font :family "DejaVu Sans Mono" :subfamily "Bold" :slant "r" :size 10))
 
-(load-module "cl-gmail-oauth")
 (defvar *updating-email-count* nil)
-
-
 
 (defun get-unread-emails ()
   (bt:make-thread
@@ -153,7 +129,6 @@
 	""
 	(concat battery-line " | "))))
 
-(load-module "cl-gitlab")
 (defvar *updating-gitlab-status* nil)
 
 (defun get-gitlab-ci-message ()

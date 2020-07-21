@@ -1,4 +1,4 @@
-(ql:quickload :trivial-shell)
+(in-package :stumpwm)
 
 (defvar *elpa-path* "/home/thomas/.emacs.d/elpa/")
 
