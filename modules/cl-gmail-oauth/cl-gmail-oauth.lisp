@@ -9,7 +9,7 @@
 
 
 (defun load-google-credentials ()
-  (with-open-file (stream ".google.lisp")
+  (with-open-file (stream ".google.lisp" :if-does-not-exist nil)
      (with-standard-io-syntax
        (setf *google-tokens* (read stream)))))
 

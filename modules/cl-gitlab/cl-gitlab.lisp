@@ -6,7 +6,7 @@
 (defvar *gitlab-status* nil)
 
 (defun get-gitlab-token ()
-  (with-open-file (stream ".gitlab.lisp")
+  (with-open-file (stream ".gitlab.lisp" :if-does-not-exist nil)
      (with-standard-io-syntax
        (setf *gitlab-credentials* (read stream)))))
 
