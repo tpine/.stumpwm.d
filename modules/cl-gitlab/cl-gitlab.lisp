@@ -34,23 +34,27 @@
 	  (list :status (gethash "status" newest-pipeline) :name (car (last pipeline)))))))
 
 (defun get-pipeline-status ()
-  (let ((status (mapcar
-		 (lambda (x)
-		   (let ((id (gethash "id" x)))
-		     (if id
-			 (get-gitlab-pipeline (list (gethash "id" x) (gethash "name" x))))))
-		 (alexandria:flatten
-		  (mapcar
-		   (lambda (x)  
-		     (get-gitlab-groups-projects (gethash "id" x)))
-		   (alexandria:flatten (get-gitlab-groups)))))))
-    (let ((success (remove-if-not (lambda (x) (format t "~a" x) (equal "success" (getf x :status))) status))
-	  (failed (remove-if-not (lambda (x) (equal "failed" (getf x :status))) status)))
-      (setf *gitlab-status* (list :success (list-length success)
-				  :failed (list :number (list-length failed)
-						:projects (mapcar
-							   (lambda (y) (getf y :name))
-							   failed)))))))
+  (handler-case   
+      (let ((status (mapcar
+		     (lambda (x)
+		       (let ((id (gethash "id" x)))
+			 (if id
+			     (get-gitlab-pipeline (list (gethash "id" x) (gethash "name" x))))))
+		     (alexandria:flatten
+		      (mapcar
+		       (lambda (x)  
+			 (get-gitlab-groups-projects (gethash "id" x)))
+		       (alexandria:flatten (get-gitlab-groups)))))))
+	(let ((success (remove-if-not (lambda (x) (format t "~a" x) (equal "success" (getf x :status))) status))
+	      (failed (remove-if-not (lambda (x) (equal "failed" (getf x :status))) status)))
+	  (setf *gitlab-status* (list :success (list-length success)
+				      :failed (list :number (list-length failed)
+						    :projects (mapcar
+							       (lambda (y) (getf y :name))
+							       failed))))))
+    (error (c)
+      (declare (ignore c))
+      nil)))
 
 (defun gitlab-get-failed-pipeline-project-names ()
   (mapcar (lambda (x) (format t "~a~%" x)) (getf (getf *gitlab-status* :failed) :projects)))

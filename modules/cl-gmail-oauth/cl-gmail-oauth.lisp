@@ -3,6 +3,7 @@
 (in-package #:cl-gmail-oauth)
 
 (defparameter *unread-emails* nil)
+(defparameter *gmail-sync-errors* nil)
 
 (defvar *google-tokens* nil)
 
@@ -54,6 +55,6 @@
 	       (setf *unread-emails* nil))
 	      (t
 	       (setf *unread-emails* (get-unread-email-count stream)))))
-    (usocket:ns-try-again-condition (c) ;; <-- optional argument
-      (declare (ignore c))
-      (setf *unread-emails* nil))))
+    (error (c) ;; <-- optional argument
+      (setf *unread-emails* nil
+	    *gmail-sync-errors* c))))
