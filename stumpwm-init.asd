@@ -20,7 +20,8 @@
 	       :cl-gitlab)
   
   :serial t
-  :components ((:file "utility")
+  :components ((:file "package")
+	       (:file "utility")
 	       (:file "notify")
 	       (:file "theme")
 	       (:file "visual")

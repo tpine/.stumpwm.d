@@ -1,4 +1,4 @@
-(in-package :stumpwm-init)
+(in-package :stumpwm)
 
 ;;; Visual
 (defvar *themes* (make-hash-table))

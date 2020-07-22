@@ -13,7 +13,7 @@
                          #'< :key #'window-number))))
 
 
-(stumpwm-init:apply-theme (gethash 'gruvbox *themes*))
+(apply-theme (gethash 'gruvbox *themes*))
 
 (xft:cache-fonts)
 (set-font (make-instance 'xft:font :family "DejaVu Sans Mono" :subfamily "Bold" :slant "r" :size 10))
