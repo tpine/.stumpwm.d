@@ -21,8 +21,8 @@
   
   :serial t
   :components ((:file "utility")
-	       (:file "slynk-fix")
 	       (:file "notify")
+	       (:file "theme")
 	       (:file "visual")
 	       (:file "keybindings")
                (:file "stumpwm-init")))

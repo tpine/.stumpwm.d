@@ -1,3 +1,5 @@
 (defpackage #:stumpwm-init
   (:use #:cl
-	#:stumpwm))
+	#:stumpwm)
+  (:export #:add-theme
+	   #:apply-theme))
