@@ -55,6 +55,6 @@
 	       (setf *unread-emails* nil))
 	      (t
 	       (setf *unread-emails* (get-unread-email-count stream)))))
-    (error (c) ;; <-- optional argument
+    (t (c) ;; <-- optional argument
       (setf *unread-emails* nil
 	    *gmail-sync-errors* c))))

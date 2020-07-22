@@ -34,7 +34,7 @@
 	  (list :status (gethash "status" newest-pipeline) :name (car (last pipeline)))))))
 
 (defun get-pipeline-status ()
-  (handler-case   
+  (ignore-errors
       (let ((status (mapcar
 		     (lambda (x)
 		       (let ((id (gethash "id" x)))
@@ -51,10 +51,7 @@
 				      :failed (list :number (list-length failed)
 						    :projects (mapcar
 							       (lambda (y) (getf y :name))
-							       failed))))))
-    (error (c)
-      (declare (ignore c))
-      nil)))
+							       failed))))))))
 
 (defun gitlab-get-failed-pipeline-project-names ()
   (mapcar (lambda (x) (format t "~a~%" x)) (getf (getf *gitlab-status* :failed) :projects)))
