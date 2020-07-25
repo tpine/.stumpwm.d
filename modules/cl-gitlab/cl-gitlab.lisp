@@ -13,20 +13,20 @@
 (get-gitlab-token)
 
 (defun get-gitlab-groups ()
-  (let ((stream (drakma:http-request "https://gitlab.com/api/v4/groups/"
-				      :additional-headers (list (cons "PRIVATE-TOKEN" (getf *gitlab-credentials* :access-token)))
+  (let ((stream (dex:get "https://gitlab.com/api/v4/groups/"
+				      :headers (list (cons "PRIVATE-TOKEN" (getf *gitlab-credentials* :access-token)))
 				      :want-stream t)))
     (yason:parse stream)))
 
 (defun get-gitlab-groups-projects (group)
-  (let ((stream (drakma:http-request (format nil "https://gitlab.com/api/v4/groups/~a/projects" group)
-				      :additional-headers (list (cons "PRIVATE-TOKEN" (getf *gitlab-credentials* :access-token)))
+  (let ((stream (dex:get (format nil "https://gitlab.com/api/v4/groups/~a/projects" group)
+				      :headers (list (cons "PRIVATE-TOKEN" (getf *gitlab-credentials* :access-token)))
 				      :want-stream t)))
     (yason:parse stream)))
 
 (defun get-gitlab-pipeline (pipeline)
-  (let ((test (multiple-value-list (drakma:http-request (format nil "https://gitlab.com/api/v4/projects/~a/pipelines" (car pipeline))
-							:additional-headers (list (cons "PRIVATE-TOKEN" (getf *gitlab-credentials* :access-token)))))))
+  (let ((test (multiple-value-list (dex:get (format nil "https://gitlab.com/api/v4/projects/~a/pipelines" (car pipeline))
+							:headers (list (cons "PRIVATE-TOKEN" (getf *gitlab-credentials* :access-token)))))))
     ;; Highest pipeline id is first
     (let ((newest-pipeline (first (yason:parse (flexi-streams:octets-to-string (nth 0 test))))))
       

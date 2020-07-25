@@ -5,7 +5,7 @@
   :author "Thomas Atkinson <tnatkinson@gmail.com>"
   :license  "GPLv2"
   :version "0.0.1"
-  :depends-on (:drakma
+  :depends-on (:dexador
 	       :yason
 	       :flexi-streams
 	       :alexandria)

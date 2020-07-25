@@ -4,7 +4,7 @@
   :author "Thomas Atkinson <tnatkinson95@gmail.com>"
   :license  "GPLv2"
   :version "0.0.1"
-  :depends-on (:drakma
+  :depends-on (:dexador
 	       :plump
 	       :xpath
 	       :yason)

@@ -29,10 +29,9 @@
     (setf (getf *google-tokens* :access-token)
 	  (gethash
 	   "access_token"
-	   (yason:parse (drakma:http-request
+	   (yason:parse (dex:post
 			 "https://accounts.google.com/o/oauth2/token"
-			 :method :post
-			 :parameters (list (cons "client_id" client-id)
+			 :content (list (cons "client_id" client-id)
 					   (cons "client_secret" client-secret)
 					   (cons "refresh_token" refresh-token)
 					   (cons "grant_type" "refresh_token"))
@@ -46,9 +45,9 @@
 
 (defun get-unread-emails ()
   (handler-case
-      (let* ((request (multiple-value-list (drakma:http-request
+      (let* ((request (multiple-value-list (dex:get
 					    "https://mail.google.com/mail/feed/atom"
-					    :additional-headers (list (cons "Authorization" (format nil "Bearer ~a" (getf *google-tokens* :access-token)))))))
+					    :headers (list (cons "Authorization" (format nil "Bearer ~a" (getf *google-tokens* :access-token)))))))
 	     (stream (nth 0 request)))
 	(cond ((equal (nth 1 request) 401)
 	       (refresh-access-token)
