@@ -45,15 +45,16 @@
 
 (defun get-unread-emails ()
   (handler-case
-      (let* ((request (multiple-value-list (dex:get
-					    "https://mail.google.com/mail/feed/atom"
-					    :headers (list (cons "Authorization" (format nil "Bearer ~a" (getf *google-tokens* :access-token)))))))
-	     (stream (nth 0 request)))
-	(cond ((equal (nth 1 request) 401)
-	       (refresh-access-token)
-	       (setf *unread-emails* nil))
-	      (t
-	       (setf *unread-emails* (get-unread-email-count stream)))))
+      (setf *unread-emails*
+	    (get-unread-email-count
+	     (dex:get
+	      "https://mail.google.com/mail/feed/atom"
+	      :headers (list (cons "Authorization" (format nil "Bearer ~a" (getf *google-tokens* :access-token))))
+	      :want-stream t)))
+    (dexador.error:http-request-unauthorized (c)
+      (declare (ignore c))
+      (refresh-access-token)
+      (get-unread-emails))
     (t (c) ;; <-- optional argument
       (setf *unread-emails* nil
 	    *gmail-sync-errors* c))))
