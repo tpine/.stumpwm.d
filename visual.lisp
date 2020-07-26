@@ -18,16 +18,15 @@
 (xft:cache-fonts)
 (set-font (make-instance 'xft:font :family "DejaVu Sans Mono" :subfamily "Bold" :slant "r" :size 10))
 
-(defvar *updating-email-count* nil)
+(defvar *email-update-lock* (bt:make-lock))
 
 (defun get-unread-emails ()
   (bt:make-thread
    (lambda ()
-     (if (not *updating-email-count*)
+     (if (bt:acquire-lock *email-update-lock*)
 	 (progn
-	   (setf *updating-email-count* t)
 	   (cl-gmail-oauth:get-unread-emails)
-	   (setf *updating-email-count* nil)))))
+	   (bt:release-lock *email-update-lock*)))))
   
   (cond ((equal cl-gmail-oauth:*unread-emails* "0") "^[^2*EMAILS^]")
 	((not cl-gmail-oauth:*unread-emails*) "^[^1*EMAILS^]")
@@ -41,16 +40,15 @@
 	""
 	(concat battery-line " | "))))
 
-(defvar *updating-gitlab-status* nil)
+(defvar *gitlab-update-lock* (bt:make-lock))
 
 (defun get-gitlab-ci-message ()
   (bt:make-thread
    (lambda ()
 
-       (if (equal *updating-gitlab-status* nil)
-	   (progn (setf *updating-gitlab-status* t)
-		  (cl-gitlab:get-pipeline-status)
-		  (setf *updating-gitlab-status* nil)))))
+       (if (bt:acquire-lock *gitlab-update-lock*)
+	   (progn (cl-gitlab:get-pipeline-status)
+		  (bt:release-lock *gitlab-update-lock*)))))
 
   (let ((failed-count (getf (getf cl-gitlab:*gitlab-status* :failed) :number)))
     (format t "~a" failed-count)
@@ -64,7 +62,7 @@
 
 ;; Show time, cpu usage and network traffic in the modelinecomment 
 (setf *screen-mode-line-format*
-      (list '(:eval (battery-format)) '(:eval (time-format "%H:%M")) " EST | " '(:eval (get-utc-time)) " UTC | " '(:eval (get-unread-emails)) " | " '(:eval (get-gitlab-ci-message)) " | %W"))
+      (list '(:eval (battery-format)) '(:eval (time-format "%H:%M")) " EST | " '(:eval (get-utc-time)) " UTC | " '(:eval (get-unread-emails)) " | " '(:eval (get-gitlab-ci-message))  " | %W"))
 
 (setf *window-format* "%n %10c: %15t")
 
