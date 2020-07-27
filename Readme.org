@@ -3,3 +3,10 @@
 
   This sets up asdf and then loads the package stumpwm-init.
   That package then does the proper initialisation using asdf to manage dependencies.
+
+  
+** Notes
+   - This uses git submodules to pull in stumpwm-contrib. To pull it while cloning run:
+     #+begin_src shell
+       git clone --recurse-submodules https://github.com/tpine/.stumpwm.d.git
+     #+end_src
