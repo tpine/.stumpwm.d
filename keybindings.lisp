@@ -142,7 +142,7 @@ C-keybinding n creates a new instance of the program"
 							     (nth screen-num (group-heads (current-group)))))))
   (group-wake-up (current-group)))
 
-(define-key *root-map* (kbd "F1") "user-switch-to-screen 1")
-(define-key *root-map* (kbd "F2") "user-switch-to-screen 2")
+(define-key *root-map* (kbd "F1") "user-switch-to-screen 2")
+(define-key *root-map* (kbd "F2") "user-switch-to-screen 1")
 (define-key *root-map* (kbd "F3") "user-switch-to-screen 0")
 
