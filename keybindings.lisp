@@ -59,30 +59,6 @@ C-keybinding n creates a new instance of the program"
 (define-key *root-map* (kbd "q") |*spotify-map*|)
 (define-key *root-map* (kbd "p") |*keepassxc-map*|)
 
-(defcommand work-keybindings () ()
-  (define-key *root-map* (kbd "i") |*insomnia-map*|)
-  (define-key *root-map* (kbd "r") |*mongodb-compass-map*|)
-  (define-key *root-map* (kbd "d") |*dbeaver-map*|))
-
-(defun focus-current-frame-on-other-head (group)
-  "Focus first frame on the next head."
-  (let* ((remaining-heads (cdr (member (group-current-head group) (screen-heads (current-screen)))))
-	 (other-head (if (null remaining-heads)
-			 (first (screen-heads (current-screen)))
-			 (car remaining-heads))))
-    (focus-frame group (first (remove-if-not (lambda (frame)
-					       (eql (frame-head group frame)
-						    other-head))
-					     (group-frames group))))))
-
-(defcommand work-setup () ()
-  "Configuration for Work Computer"
-  (run-shell-command "xrandr --output HDMI1 --off --output DP1 --mode 1920x1080 --pos 1920x0 --rotate normal --output eDP1 --primary --mode 1920x1080 --pos 0x0 --rotate normal --output VIRTUAL1 --off" t)
-  (focus-current-frame-on-other-head (current-group))
-  (mode-line)
-  (work-keybindings)
-  (fnext))
-
 ;; Setup bindings for less common aplications which would be opened then closed
 (defcommand screenshot () ()
   "Do we wanna Scrot? Yeah! We wanna Scrot!"
@@ -124,7 +100,6 @@ C-keybinding n creates a new instance of the program"
 
 (defparameter *layout-map*
   (let ((m (make-sparse-keymap)))
-    (define-key m (kbd "w") "work-setup")
     (define-key m (kbd "s") *screenshot-map*)
     m) )
 
@@ -138,6 +113,7 @@ C-keybinding n creates a new instance of the program"
 (define-key *root-map* (kbd "s") *system-map*)
 
 (defcommand user-switch-to-screen (screen-num) ((:number "Screen Number: "))
+  "Only works when there is a currently open window on the screen"
   (select-window-by-number (window-number (car (head-windows (current-group)
 							     (nth screen-num (group-heads (current-group)))))))
   (group-wake-up (current-group)))
