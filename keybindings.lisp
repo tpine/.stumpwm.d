@@ -38,6 +38,8 @@ C-keybinding n creates a new instance of the program"
 
 (make-program-binding "thunar" "Thunar")
 
+(make-program-binding "slack" "Slack")
+
 (make-program-binding "terminator" "Terminator")
 
 (make-program-binding "emacsclient -c" "Emacs" "emacs")
@@ -52,12 +54,18 @@ C-keybinding n creates a new instance of the program"
 
 (make-program-binding "keepassxc" "keepassxc")
 
-(define-key *root-map* (kbd "f") |*firefox-map*|)
-(define-key *root-map* (kbd "e") |*emacs-map*|)
-(define-key *root-map* (kbd "m") |*thunar-map*|)
-(define-key *root-map* (kbd "c") |*terminator-map*|)
-(define-key *root-map* (kbd "q") |*spotify-map*|)
-(define-key *root-map* (kbd "p") |*keepassxc-map*|)
+(defparameter *program-map*
+  (let ((m (make-sparse-keymap)))
+    (define-key m (kbd "f") |*firefox-map*|)
+    (define-key m (kbd "s") |*slack-map*|)
+    (define-key m (kbd "e") |*emacs-map*|)
+    (define-key m (kbd "m") |*thunar-map*|)
+    (define-key m (kbd "c") |*terminator-map*|)
+    (define-key m (kbd "q") |*spotify-map*|)
+    (define-key m (kbd "p") |*keepassxc-map*|)
+    m))
+
+(define-key *root-map* (kbd "p") *program-map*)
 
 ;; Setup bindings for less common aplications which would be opened then closed
 (defcommand screenshot () ()
@@ -66,9 +74,17 @@ C-keybinding n creates a new instance of the program"
 
 (defcommand screenshot-name () ()
 	    "Do we wanna Scrot? Yeah! We wanna Scrot!"
-	    (run-shell-command (concat "cd /home/thomas/Pictures/screenshots/; scrot temp.png") t)
-	    (let ((filename (read-one-line (current-screen) "Filename:")))
-	      (run-shell-command (concat "cd /home/thomas/Pictures/screenshots/; mv ./temp.png ./" filename ".png"))))
+  (let ((filename (read-one-line (current-screen) "Filename:")))
+    (run-shell-command (concat "cd /home/thomas/Pictures/screenshots/; scrot " filename ".png") t)))
+
+(defcommand screenshot-select () ()
+  "Do we wanna Scrot? Yeah! We wanna Scrot!"
+  (run-shell-command "cd /home/thomas/Pictures/screenshots/; scrot -s"))
+
+(defcommand screenshot-name-select () ()
+  "Do we wanna Scrot? Yeah! We wanna Scrot!"	    
+  (let ((filename (read-one-line (current-screen) "Filename:")))
+    (run-shell-command (concat "cd /home/thomas/Pictures/screenshots/; scrot -s " filename ".png") t)))
 
 (defcommand volume-control () ()
 	    "Start volume control"
@@ -90,6 +106,7 @@ C-keybinding n creates a new instance of the program"
   (let ((m (make-sparse-keymap)))
     (define-key m (kbd "f") "screenshot")
     (define-key m (kbd "n") "screenshot-name")
+    (define-key m (kbd "s") "screenshot-select")
     m))
 
 (defparameter *power-map*
@@ -98,16 +115,11 @@ C-keybinding n creates a new instance of the program"
     (define-key m (kbd "r") "reboot")
     m)) 
 
-(defparameter *layout-map*
-  (let ((m (make-sparse-keymap)))
-    (define-key m (kbd "s") *screenshot-map*)
-    m) )
-
 (defparameter *system-map*
   (let ((m (make-sparse-keymap)))
     (define-key m (kbd "s") *screenshot-map*)
-    (define-key m (kbd "l") *layout-map*)
     (define-key m (kbd "p") *power-map*)
+    (define-key m (kbd "v") "volume-control")
     m))
 
 (define-key *root-map* (kbd "s") *system-map*)
