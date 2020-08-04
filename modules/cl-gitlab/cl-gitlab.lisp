@@ -14,14 +14,12 @@
 
 (defun get-gitlab-groups ()
   (let ((stream (dex:get "https://gitlab.com/api/v4/groups/"
-				      :headers (list (cons "PRIVATE-TOKEN" (getf *gitlab-credentials* :access-token)))
-				      :want-stream t)))
+				      :headers (list (cons "PRIVATE-TOKEN" (getf *gitlab-credentials* :access-token))))))
     (yason:parse stream)))
 
 (defun get-gitlab-groups-projects (group)
   (let ((stream (dex:get (format nil "https://gitlab.com/api/v4/groups/~a/projects" group)
-				      :headers (list (cons "PRIVATE-TOKEN" (getf *gitlab-credentials* :access-token)))
-				      :want-stream t)))
+				      :headers (list (cons "PRIVATE-TOKEN" (getf *gitlab-credentials* :access-token))))))
     (yason:parse stream)))
 
 (defun get-gitlab-pipeline (pipeline)

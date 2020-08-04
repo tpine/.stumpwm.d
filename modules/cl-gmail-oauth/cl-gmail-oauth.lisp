@@ -34,12 +34,10 @@
 			 :content (list (cons "client_id" client-id)
 					   (cons "client_secret" client-secret)
 					   (cons "refresh_token" refresh-token)
-					   (cons "grant_type" "refresh_token"))
-			 :want-stream t))))))
+					   (cons "grant_type" "refresh_token"))))))))
 
 
 (defun get-unread-email-count (xml)
-  (format t "~a" xml)
   (let ((doc (plump:parse xml)))
     (plump:render-text (car (plump:get-elements-by-tag-name doc "fullcount")))))
 
@@ -49,8 +47,7 @@
 	    (get-unread-email-count
 	     (dex:get
 	      "https://mail.google.com/mail/feed/atom"
-	      :headers (list (cons "Authorization" (format nil "Bearer ~a" (getf *google-tokens* :access-token))))
-	      :want-stream t)))
+	      :headers (list (cons "Authorization" (format nil "Bearer ~a" (getf *google-tokens* :access-token)))))))
     (dexador.error:http-request-unauthorized (c)
       (declare (ignore c))
       (refresh-access-token)
