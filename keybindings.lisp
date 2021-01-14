@@ -42,9 +42,11 @@ C-keybinding n creates a new instance of the program"
 
 (make-program-binding "terminator" "Terminator")
 
-(make-program-binding "emacsclient -c" "Emacs" "emacs")
+(make-program-binding "emacs" "Emacs" "emacs")
 
 (make-program-binding "insomnia" "Insomnia")
+
+(make-program-binding "keepassxc" "KeePassXC")
 
 (make-program-binding "mongodb-compass" "mongodb-compass")
 
