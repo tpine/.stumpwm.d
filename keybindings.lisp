@@ -48,6 +48,8 @@ C-keybinding n creates a new instance of the program"
 
 (make-program-binding "keepassxc" "KeePassXC")
 
+(make-program-binding "google-chrome-stable" "Google-chrome" "chrome")
+
 (make-program-binding "mongodb-compass" "mongodb-compass")
 
 (make-program-binding "dbeaver" "DBeaver")
@@ -65,6 +67,7 @@ C-keybinding n creates a new instance of the program"
     (define-key m (kbd "c") |*alacritty-map*|)
     (define-key m (kbd "q") |*spotify-map*|)
     (define-key m (kbd "p") |*keepassxc-map*|)
+(define-key m (kbd "g") |*chrome-map*|)
     m))
 
 (define-key *root-map* (kbd "p") *program-map*)
