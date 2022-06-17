@@ -40,7 +40,7 @@ C-keybinding n creates a new instance of the program"
 
 (make-program-binding "slack" "Slack")
 
-(make-program-binding "terminator" "Terminator")
+(make-program-binding "alacritty" "Alacritty")
 
 (make-program-binding "emacs" "Emacs" "emacs")
 
@@ -62,7 +62,7 @@ C-keybinding n creates a new instance of the program"
     (define-key m (kbd "s") |*slack-map*|)
     (define-key m (kbd "e") |*emacs-map*|)
     (define-key m (kbd "m") |*thunar-map*|)
-    (define-key m (kbd "c") |*terminator-map*|)
+    (define-key m (kbd "c") |*alacritty-map*|)
     (define-key m (kbd "q") |*spotify-map*|)
     (define-key m (kbd "p") |*keepassxc-map*|)
     m))
