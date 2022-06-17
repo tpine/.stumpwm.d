@@ -1,6 +1,5 @@
 ;;; Swap Caps with Ctrl
 (run-shell-command "~/fix-screens.sh")
-(run-shell-command "setxkbmap -option ctrl:swapcaps")
 (setq *startup-message* (format nil "Welcome Thomas!~%Slynk is on port 4004~%Happy Hacking!"))
 
 (load "~/.stumpwm.d/visual.lisp")
