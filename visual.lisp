@@ -132,4 +132,4 @@
 ;; Turn on the modeline
 (mapcar (lambda (head)
 	  (toggle-mode-line (current-screen) head))
-	(group-heads (current-group)))
+	(screen-heads (current-screen)))
